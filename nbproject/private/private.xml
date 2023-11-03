@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/MyProjects/java-netbeans/Cafe%20Online/src/database/connect.java</file>
-            <file>file:/D:/MyProjects/java-netbeans/Cafe%20Online/src/Interface/dashboard.java</file>
-            <file>file:/D:/MyProjects/java-netbeans/Cafe%20Online/src/Interface/product_management.java</file>
-            <file>file:/D:/MyProjects/java-netbeans/Cafe%20Online/src/Interface/transaction.java</file>
-            <file>file:/D:/MyProjects/java-netbeans/Cafe%20Online/src/Interface/login.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/dashboard.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/transaction.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/product_management.java</file>
         </group>
     </open-files>
 </project-private>
