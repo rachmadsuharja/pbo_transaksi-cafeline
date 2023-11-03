@@ -7,6 +7,7 @@ package Interface;
 
 import javax.swing.JList;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,61 +16,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
         
 /**
  *
  * @author Harja
  */
 public class transaction extends javax.swing.JFrame {
+    private DefaultTableModel tempCart;
     private String SQL;
+    database.connect DB = new database.connect();
     Connection con;
     Statement stat;
+    java.sql.ResultSet ResultSet;
+    java.sql.PreparedStatement PreparedStatement;
     public ResultSet rs;
 
     /**
      * Creates new form transaction
      */
     
-//    private void searchMenu(String key) {
-//        try {
-//            menuList = new DefaultTableModel();
-//            menuList.addColumn("Id");
-//            menuList.addColumn("Product");
-//            menuList.addColumn("Price");
-//            menuList.addColumn("Stock");
-//            
-//            jTable_menu.setModel(menuList);
-//            database.connect DB = new database.connect();
-//            DB.config();
-//            con=DB.con;
-//            stat=DB.stm;
-//            menuList.getDataVector().removeAllElements();
-//            
-//            java.sql.Statement stmt = con.createStatement();
-//            SQL = "SELECT * FROM admin_dashboard WHERE id LIKE '%"+key+"%' OR product LIKE '%"+key+"%' OR price LIKE '%"+key+"%'";
-//            java.sql.ResultSet res = stmt.executeQuery(SQL);
-//            while (res.next()){
-//                menuList.addRow(new Object[]{
-//                    res.getString("id"),
-//                    res.getString("product"),
-//                    res.getString("price"),
-//                    res.getString("stock")
-//                });
-//            }
-//        } catch(Exception e) {
-//            JOptionPane.showMessageDialog(null, "Failed");
-//        }
-//    }
     
     private void searchMenu(String key) {
-        database.connect DB = new database.connect();
         DB.config();
         con=DB.con;
         stat=DB.stm;
         try {
-            java.sql.Statement stmt = con.createStatement();
-            SQL = "SELECT * FROM admin_dashboard WHERE product LIKE '%"+key+"%'";
-            java.sql.ResultSet data = stmt.executeQuery(SQL);
+            SQL = "SELECT * FROM products WHERE product LIKE '%"+key+"%'";
+            ResultSet data = stat.executeQuery(SQL);
             DefaultListModel menuList = new DefaultListModel();
             System.out.println(menuList);
             jList_menuList.setModel(menuList);
@@ -88,9 +62,8 @@ public class transaction extends javax.swing.JFrame {
         con=DB.con;
         stat=DB.stm;
         try {
-            java.sql.Statement stmt = con.createStatement();
-            SQL = "SELECT * FROM admin_dashboard";
-            java.sql.ResultSet data = stmt.executeQuery(SQL);
+            SQL = "SELECT * FROM products";
+            ResultSet data = stat.executeQuery(SQL);
             DefaultListModel menuList = new DefaultListModel();
             System.out.println(menuList);
             jList_menuList.setModel(menuList);
@@ -104,10 +77,42 @@ public class transaction extends javax.swing.JFrame {
                 
     }
     
+    public void showTempCart() {
+        tempCart = new DefaultTableModel();
+        tempCart.addColumn("Kode");
+        tempCart.addColumn("Produk");
+        tempCart.addColumn("Harga Satuan");
+        tempCart.addColumn("Jumlah Beli");
+        tempCart.addColumn("Total Harga");
+        
+        jTable_tempCart.setModel(tempCart);
+        database.connect DB = new database.connect();
+        DB.config();
+        con=DB.con;
+        stat=DB.stm;
+        tempCart.getDataVector().removeAllElements();
+        try {
+            SQL = "SELECT * FROM temp_cart";
+            ResultSet res = stat.executeQuery(SQL);
+            while (res.next()){
+                tempCart.addRow(new Object[]{
+                    res.getString("id"),
+                    res.getString("product"),
+                    res.getString("price"),
+                    res.getString("purchase_amount"),
+                    res.getString("total_price")
+                });
+            }
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(null, "Failed");
+        }
+    }
+    
     public transaction() {
         initComponents();
         this.setLocationRelativeTo(null);
         showMenuList();
+        showTempCart();
     }
 
     /**
@@ -139,9 +144,14 @@ public class transaction extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jButton_addToCart = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        jTextField_purchaseAmount = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         jButton_back_to_dashboard = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable_tempCart = new javax.swing.JTable();
+        jLabel12 = new javax.swing.JLabel();
+        jTextField_tempCartSelectedProduct = new javax.swing.JTextField();
+        jButton_deleteSelectedProduct = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -269,8 +279,8 @@ public class transaction extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jTextField1.setToolTipText("Jumlah");
+        jTextField_purchaseAmount.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jTextField_purchaseAmount.setToolTipText("Jumlah");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(102, 102, 0));
@@ -286,6 +296,43 @@ public class transaction extends javax.swing.JFrame {
             }
         });
 
+        jTable_tempCart.setFont(new java.awt.Font("Tahoma", 0, 17)); // NOI18N
+        jTable_tempCart.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jTable_tempCart.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable_tempCartMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jTable_tempCart);
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(102, 102, 0));
+        jLabel12.setText("Keranjang");
+
+        jTextField_tempCartSelectedProduct.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
+        jTextField_tempCartSelectedProduct.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextField_tempCartSelectedProduct.setEnabled(false);
+
+        jButton_deleteSelectedProduct.setBackground(new java.awt.Color(204, 102, 0));
+        jButton_deleteSelectedProduct.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jButton_deleteSelectedProduct.setForeground(new java.awt.Color(255, 204, 153));
+        jButton_deleteSelectedProduct.setText("Hapus");
+        jButton_deleteSelectedProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_deleteSelectedProductActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -295,36 +342,47 @@ public class transaction extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel5)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jText_Field_searchMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(120, 120, 120)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane2)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTextField_product, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
-                                            .addComponent(jTextField_price, javax.swing.GroupLayout.Alignment.LEADING))
-                                        .addComponent(jLabel7))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jButton_addToCart)))
-                                .addGap(34, 34, 34)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jTextField_code, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField_stock, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)))
-                            .addComponent(jLabel11)))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel12)
+                                        .addGap(335, 335, 335))
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel4)
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel5)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jText_Field_searchMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(120, 120, 120)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jTextField_tempCartSelectedProduct)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jButton_deleteSelectedProduct))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jTextField_product, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                                                .addComponent(jTextField_price, javax.swing.GroupLayout.Alignment.LEADING))
+                                            .addComponent(jLabel7))
+                                        .addGap(34, 34, 34)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jTextField_code, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jTextField_stock, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel11)
+                                            .addComponent(jTextField_purchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jButton_addToCart, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jButton_back_to_dashboard)))
@@ -345,7 +403,7 @@ public class transaction extends javax.swing.JFrame {
                         .addComponent(jText_Field_searchMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(19, 19, 19)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
@@ -359,17 +417,28 @@ public class transaction extends javax.swing.JFrame {
                             .addComponent(jLabel8)
                             .addComponent(jLabel9))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField_price, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
-                            .addComponent(jTextField_stock))
-                        .addGap(19, 19, 19)
-                        .addComponent(jLabel11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton_addToCart, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1))
-                .addGap(467, 467, 467))
+                            .addComponent(jTextField_price, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField_stock, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(50, 50, 50)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jButton_addToCart, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField_purchaseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel11)
+                                .addGap(54, 54, 54))))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(39, 39, 39)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(jButton_deleteSelectedProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField_tempCartSelectedProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(174, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -394,9 +463,8 @@ public class transaction extends javax.swing.JFrame {
     private void jList_menuListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList_menuListMouseClicked
         try {
             String selected = jList_menuList.getSelectedValue();
-            java.sql.Statement stmt = con.createStatement();
-            String SQL = "SELECT * FROM admin_dashboard WHERE product = '"+ selected +"'";
-            java.sql.ResultSet data = stmt.executeQuery(SQL);
+            String SQL = "SELECT * FROM products WHERE product = '"+ selected +"'";
+            ResultSet data = stat.executeQuery(SQL);
             if (data.next()) {
                 String code = data.getString("id");
                 String product = data.getString("product");
@@ -433,7 +501,39 @@ public class transaction extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField_codeActionPerformed
 
     private void jButton_addToCartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_addToCartActionPerformed
-        
+        DB.config();
+        String code = jTextField_code.getText();
+        String product = jTextField_product.getText();
+        String priceStr = jTextField_price.getText();
+        String purchaseAmountStr = jTextField_purchaseAmount.getText();
+        String stockStr = jTextField_stock.getText();
+        int purchaseAmount = Integer.parseInt(purchaseAmountStr);
+        int stock = Integer.parseInt(stockStr);
+        if (purchaseAmount > stock) {
+            JOptionPane.showMessageDialog(null, "Stok produk tidak tersedia");
+        } else {
+            try {
+                String selected = jTextField_code.getText();
+                int reduceStock = stock-purchaseAmount;
+                int price = Integer.parseInt(priceStr);
+                int totalPrice = price*purchaseAmount;
+                String reduceStockQuery = "UPDATE `products` SET stock='"+reduceStock+"' WHERE id='"+selected+"'";
+                PreparedStatement stm = con.prepareStatement(reduceStockQuery);
+                stm.executeUpdate();
+                SQL = "INSERT INTO temp_cart (id,product,price,total_price,purchase_amount) VALUES ('"+code+"','"+product+"','"+price+"','"+totalPrice+"','"+purchaseAmount+"')";
+                PreparedStatement stat = con.prepareStatement(SQL);
+                stat.execute();
+                jTextField_code.setText("");
+                jTextField_product.setText("");
+                jTextField_price.setText("");
+                jTextField_stock.setText("");
+                jTextField_purchaseAmount.setText("");
+                showMenuList();
+                showTempCart();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
     }//GEN-LAST:event_jButton_addToCartActionPerformed
 
     private void jButton_back_to_dashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_back_to_dashboardActionPerformed
@@ -441,6 +541,38 @@ public class transaction extends javax.swing.JFrame {
         start.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton_back_to_dashboardActionPerformed
+
+    private void jButton_deleteSelectedProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_deleteSelectedProductActionPerformed
+        try {
+            DB.config();
+            int tempCartRow = jTable_tempCart.getSelectedRow();
+            String code = tempCart.getValueAt(tempCartRow, 0).toString();
+            String selectProduct = "SELECT * FROM products WHERE id = '"+code+"'";
+            ResultSet data = stat.executeQuery(selectProduct);
+            if (data.next()) {
+                String stockStr = data.getString("stock");
+                String purchaseAmountStr = tempCart.getValueAt(tempCartRow, 3).toString();
+                int stock = Integer.parseInt(stockStr);
+                int purchaseAmount = Integer.parseInt(purchaseAmountStr);
+                int originalStock = stock+purchaseAmount;
+                String backStock = "UPDATE `products` SET stock = '"+ originalStock +"' WHERE id = '"+code+"'";
+                PreparedStatement stm = con.prepareStatement(backStock);
+                stm.executeUpdate();
+            }
+            SQL = "DELETE FROM temp_cart WHERE id = '"+code+"'";
+            PreparedStatement stm = con.prepareStatement(SQL);
+            stm.executeUpdate();
+            showTempCart();
+            showMenuList();
+        } catch (SQLException ex) {
+            Logger.getLogger(transaction.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_deleteSelectedProductActionPerformed
+
+    private void jTable_tempCartMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_tempCartMouseClicked
+        int row = jTable_tempCart.getSelectedRow();
+        jTextField_tempCartSelectedProduct.setText(tempCart.getValueAt(row, 1).toString());
+    }//GEN-LAST:event_jTable_tempCartMouseClicked
 
     /**
      * @param args the command line arguments
@@ -480,9 +612,11 @@ public class transaction extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_addToCart;
     private javax.swing.JButton jButton_back_to_dashboard;
+    private javax.swing.JButton jButton_deleteSelectedProduct;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -495,11 +629,14 @@ public class transaction extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable_tempCart;
     private javax.swing.JTextField jTextField_code;
     private javax.swing.JTextField jTextField_price;
     private javax.swing.JTextField jTextField_product;
+    private javax.swing.JTextField jTextField_purchaseAmount;
     private javax.swing.JTextField jTextField_stock;
+    private javax.swing.JTextField jTextField_tempCartSelectedProduct;
     private javax.swing.JTextField jText_Field_searchMenu;
     // End of variables declaration//GEN-END:variables
 }

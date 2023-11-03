@@ -20,6 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class product_management extends javax.swing.JFrame {
     private DefaultTableModel menuList;
+    database.connect DB = new database.connect();
     private String SQL;
     Connection con;
     Statement stat;
@@ -29,19 +30,18 @@ public class product_management extends javax.swing.JFrame {
     public void showMenuList(){
         menuList = new DefaultTableModel();
         menuList.addColumn("Id");
-        menuList.addColumn("Product");
-        menuList.addColumn("Price");
-        menuList.addColumn("Stock");
+        menuList.addColumn("Produk");
+        menuList.addColumn("Harga");
+        menuList.addColumn("Stok");
         
         jTable_menu.setModel(menuList);
-        database.connect DB = new database.connect();
         DB.config();
         con=DB.con;
         stat=DB.stm;
         menuList.getDataVector().removeAllElements();
         try {
             java.sql.Statement stmt = con.createStatement();
-            SQL = "SELECT * FROM admin_dashboard";
+            SQL = "SELECT * FROM products";
             java.sql.ResultSet res = stmt.executeQuery(SQL);
             while (res.next()){
                 menuList.addRow(new Object[]{
@@ -421,8 +421,7 @@ public class product_management extends javax.swing.JFrame {
             String value3=jTextField_stock.getText();
             int row = jTable_menu.getSelectedRow();
 
-            String edit= "UPDATE `admin_dashboard` SET id='"+value0+"',product='"+value1+"',price='"+value2+"',stock='"+value3+"' WHERE id='"+menuList.getValueAt(row, 0)+"'";
-            database.connect DB = new database.connect();
+            String edit= "UPDATE `products` SET id='"+value0+"',product='"+value1+"',price='"+value2+"',stock='"+value3+"' WHERE id='"+menuList.getValueAt(row, 0)+"'";
             PreparedStatement stm = con.prepareStatement(edit);
             stm.executeUpdate();
             JOptionPane.showMessageDialog(null, "Berhasil mengubah produk");
@@ -446,7 +445,7 @@ public class product_management extends javax.swing.JFrame {
             int confirm = JOptionPane.showConfirmDialog(null,"Hapus Data?","Konfirmasi", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    java.sql.PreparedStatement stm=con.prepareStatement("DELETE FROM admin_dashboard WHERE product='"+jTextField_product.getText()+"'");
+                    java.sql.PreparedStatement stm=con.prepareStatement("DELETE FROM products WHERE product='"+jTextField_product.getText()+"'");
                     stm.executeUpdate();
                     JOptionPane.showMessageDialog(null, "Data deleted");
                     showMenuList();
@@ -480,7 +479,7 @@ public class product_management extends javax.swing.JFrame {
             DB.config();
             con=DB.con;
             stat=DB.stm;
-            String q = "INSERT INTO admin_dashboard (id,product,price,stock) VALUES ('"+jTextField_code.getText()+"','"+jTextField_product.getText()+"','"+jTextField_price.getText()+"','"+jTextField_stock.getText()+"')";
+            String q = "INSERT INTO products (id,product,price,stock) VALUES ('"+jTextField_code.getText()+"','"+jTextField_product.getText()+"','"+jTextField_price.getText()+"','"+jTextField_stock.getText()+"')";
             java.sql.PreparedStatement stat = con.prepareStatement(q);
             stat.execute();
             JOptionPane.showMessageDialog(null, "Berhasil menambahkan produk");
@@ -516,7 +515,7 @@ public class product_management extends javax.swing.JFrame {
             menuList.getDataVector().removeAllElements();
             
             java.sql.Statement stmt = con.createStatement();
-            SQL = "SELECT * FROM admin_dashboard WHERE id LIKE '%"+key+"%' OR product LIKE '%"+key+"%' OR price LIKE '%"+key+"%'";
+            SQL = "SELECT * FROM products WHERE id LIKE '%"+key+"%' OR product LIKE '%"+key+"%' OR price LIKE '%"+key+"%'";
             java.sql.ResultSet res = stmt.executeQuery(SQL);
             while (res.next()){
                 menuList.addRow(new Object[]{
