@@ -5,7 +5,11 @@
         <group>
             <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/dashboard.java</file>
             <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/transaction.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/assets/java.png</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/database/connect.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/receipt.java</file>
             <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/product_management.java</file>
+            <file>file:/D:/MyProjects/java-netbeans/pbo_transaksi-cafeline/src/Interface/login.java</file>
         </group>
     </open-files>
 </project-private>
